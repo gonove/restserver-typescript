@@ -10,7 +10,7 @@ exports.getUsers = getUsers;
 const getUser = (req, res) => {
     const { id } = req.params;
     res.json({
-        msg: 'getUser',
+        msg: 'getUser 1',
         id
     });
 };

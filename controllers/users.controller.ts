@@ -13,7 +13,7 @@ export const getUser = ( req:Request, res:Response ) => {
     const { id } = req.params
 
     res.json({
-        msg : 'getUser',
+        msg : 'getUser 1',
         id
     })
 }
