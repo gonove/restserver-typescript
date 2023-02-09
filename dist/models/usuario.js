@@ -17,4 +17,3 @@ const User = connection_1.default.define('users', {
     },
 });
 exports.default = User;
-//# sourceMappingURL=usuario.js.map

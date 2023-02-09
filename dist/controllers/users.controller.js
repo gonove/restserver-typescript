@@ -18,8 +18,19 @@ const getUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const query = { where: {
             estado: 1
         } };
-    const usuarios = yield usuario_1.default.findAll(query);
-    res.json({ usuarios });
+    const { limite = 5, desde = 0 } = req.query;
+    // const usuarios = await User.findAll( query )
+    const [total, usuarios] = yield Promise.all([
+        usuario_1.default.count(query),
+        usuario_1.default.findAll({
+            offset: Number(desde),
+            limit: Number(limite)
+        })
+    ]);
+    res.json({
+        total,
+        usuarios
+    });
 });
 exports.getUsers = getUsers;
 const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -35,30 +46,55 @@ const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     });
 });
 exports.getUser = getUser;
-const postUser = (req, res) => {
+const postUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { body } = req;
-    res.json({
-        msg: 'postUser',
-        body
-    });
-};
+    try {
+        const usuario = usuario_1.default.build(body);
+        yield usuario.save();
+        return res.json({
+            usuario
+        });
+    }
+    catch (error) {
+        return res.status(500).json({
+            msg: 'Hable con el administrador'
+        });
+    }
+});
 exports.postUser = postUser;
-const putUser = (req, res) => {
+const putUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const { body } = req;
-    res.json({
-        msg: 'putUser',
-        body,
-        id
-    });
-};
+    try {
+        const usuario = yield usuario_1.default.findByPk(id);
+        yield (usuario === null || usuario === void 0 ? void 0 : usuario.update(body));
+        res.json({
+            usuario
+        });
+    }
+    catch (error) {
+        return res.status(400).json({
+            msg: '</3',
+            error
+        });
+    }
+});
 exports.putUser = putUser;
-const deleteUser = (req, res) => {
+const deleteUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
+    try {
+        const usuario = yield usuario_1.default.findByPk(id);
+        yield (usuario === null || usuario === void 0 ? void 0 : usuario.update({ estado: false }));
+    }
+    catch (error) {
+        return res.status(500).json({
+            msg: 'el delete falló </3',
+            error
+        });
+    }
     res.json({
         msg: 'deleteUser',
         id
     });
-};
+});
 exports.deleteUser = deleteUser;
-//# sourceMappingURL=users.controller.js.map

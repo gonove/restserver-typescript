@@ -14,4 +14,3 @@ const db = new sequelize_1.Sequelize(process.env.NAME_LOCAL || 'db_name', proces
     // logging : false //muestra en consola comandos ejecutados
 });
 exports.default = db;
-//# sourceMappingURL=connection.js.map

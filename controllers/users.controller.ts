@@ -7,10 +7,21 @@ export const getUsers = async( req:Request, res:Response ) => {
     const query = { where : {
         estado : 1
     }}
+    const { limite = 5, desde = 0 } = req.query;
 
-    const usuarios = await User.findAll( query )
+    // const usuarios = await User.findAll( query )
+    const [ total, usuarios ] =  await Promise.all([
+        User.count( query ),
+        User.findAll({
+            offset : Number(desde),
+            limit : Number(limite)
+        })
+    ])
 
-    res.json({ usuarios })
+    res.json({
+        total,
+        usuarios
+    })
 }
 
 export const getUser = async( req:Request, res:Response ) => {
@@ -30,31 +41,63 @@ export const getUser = async( req:Request, res:Response ) => {
     })
 }
 
-export const postUser = ( req:Request, res:Response ) => {
+export const postUser = async( req:Request, res:Response ) => {
 
-    const { body } = req
+    const { body } = req;
 
-    res.json({
-        msg : 'postUser',
-        body
-    })
+    try {
+
+        const usuario = User.build( body )
+        await usuario.save()
+
+        return res.json({
+            usuario
+        })
+
+    } catch (error) {
+
+        return res.status(500).json({
+            msg : 'Hable con el administrador'
+        })
+    }
 }
 
-export const putUser = ( req:Request, res:Response ) => {
+export const putUser = async( req:Request, res:Response ) => {
 
     const { id } = req.params
     const { body } = req
 
-    res.json({
-        msg : 'putUser',
-        body,
-        id
-    })
+    try {
+
+        const usuario = await User.findByPk( id )
+        await usuario?.update( body )
+
+        res.json({
+            usuario
+        })
+    } catch (error) {
+        return res.status(400).json({
+            msg : '</3',
+            error
+        })
+    }
 }
 
-export const deleteUser = ( req:Request, res:Response ) => {
+export const deleteUser = async( req:Request, res:Response ) => {
 
     const { id } = req.params
+
+    try {
+        const usuario = await User.findByPk( id )
+        await usuario?.update({ estado : false })
+
+    } catch (error) {
+
+        return res.status(500).json({
+            msg : 'el delete falló </3',
+            error
+        })
+    }
 
     res.json({
         msg : 'deleteUser',
