@@ -1,20 +1,32 @@
 import { Request, Response } from "express";
+import User from '../models/usuario';
 
 
-export const getUsers = ( req:Request, res:Response ) => {
+export const getUsers = async( req:Request, res:Response ) => {
 
-    res.json({
-        msg : 'getUsers'
-    })
+    const query = { where : {
+        estado : 1
+    }}
+
+    const usuarios = await User.findAll( query )
+
+    res.json({ usuarios })
 }
 
-export const getUser = ( req:Request, res:Response ) => {
+export const getUser = async( req:Request, res:Response ) => {
 
     const { id } = req.params
 
+    const usuario = await User.findByPk( id )
+
+    if (!usuario) {
+        return res.status(404).json({
+            msg : `El usuario: ${id} no existe </3`
+        })
+    }
+
     res.json({
-        msg : 'getUser 1',
-        id
+        usuario
     })
 }
 
